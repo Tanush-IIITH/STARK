@@ -1,0 +1,6 @@
+# No external dependencies required
+# This project uses only Python standard library
+
+# Optional: For development and testing
+# pytest>=7.0.0  # For advanced testing (optional)
+# numpy>=1.20.0  # For numerical analysis (optional)
