@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-09T12:50:09.676141",
+  "timestamp": "2025-11-13T11:13:38.607761",
   "benchmarks": [
     {
       "test_type": "basic_matching",
@@ -81,43 +81,43 @@
           "pattern_length": 5,
           "text_length": 100000,
           "matches_found": 95,
-          "time_seconds": 0.01280665397644043,
-          "time_ms": 12.80665397644043
+          "time_seconds": 0.011955499649047852,
+          "time_ms": 11.955499649047852
         },
         {
           "pattern_length": 10,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.009207487106323242,
-          "time_ms": 9.207487106323242
+          "time_seconds": 0.007548332214355469,
+          "time_ms": 7.548332214355469
         },
         {
           "pattern_length": 20,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.004999876022338867,
-          "time_ms": 4.999876022338867
+          "time_seconds": 0.0046765804290771484,
+          "time_ms": 4.676580429077148
         },
         {
           "pattern_length": 50,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.007172584533691406,
-          "time_ms": 7.172584533691406
+          "time_seconds": 0.00574946403503418,
+          "time_ms": 5.74946403503418
         },
         {
           "pattern_length": 100,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.005879402160644531,
-          "time_ms": 5.879402160644531
+          "time_seconds": 0.0049228668212890625,
+          "time_ms": 4.9228668212890625
         },
         {
           "pattern_length": 200,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.007092952728271484,
-          "time_ms": 7.092952728271484
+          "time_seconds": 0.0073392391204833984,
+          "time_ms": 7.339239120483398
         }
       ]
     },
@@ -129,41 +129,41 @@
           "text_length": 10000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.0,
-          "time_ms": 0.0,
-          "chars_per_second": Infinity
+          "time_seconds": 0.0006318092346191406,
+          "time_ms": 0.6318092346191406,
+          "chars_per_second": 15827562.264150944
         },
         {
           "text_length": 50000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.0030107498168945312,
-          "time_ms": 3.0107498168945312,
-          "chars_per_second": 16607158.694963573
+          "time_seconds": 0.003127574920654297,
+          "time_ms": 3.127574920654297,
+          "chars_per_second": 15986827.260253087
         },
         {
           "text_length": 100000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.006529569625854492,
-          "time_ms": 6.529569625854492,
-          "chars_per_second": 15314945.046920072
+          "time_seconds": 0.0063173770904541016,
+          "time_ms": 6.317377090454102,
+          "chars_per_second": 15829354.266520739
         },
         {
           "text_length": 500000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.03412318229675293,
-          "time_ms": 34.12318229675293,
-          "chars_per_second": 14652795.148229146
+          "time_seconds": 0.03168344497680664,
+          "time_ms": 31.68344497680664,
+          "chars_per_second": 15781112.198058546
         },
         {
           "text_length": 1000000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.06638050079345703,
-          "time_ms": 66.38050079345703,
-          "chars_per_second": 15064664.894763308
+          "time_seconds": 0.06301665306091309,
+          "time_ms": 63.016653060913086,
+          "chars_per_second": 15868821.199269043
         }
       ]
     },
@@ -172,8 +172,8 @@
       "text_length": 100000,
       "num_patterns": 10,
       "total_matches": 10,
-      "total_time_ms": 78.23491096496582,
-      "avg_time_per_pattern_ms": 7.823491096496582,
+      "total_time_ms": 74.27167892456055,
+      "avg_time_per_pattern_ms": 7.427167892456055,
       "pattern_results": [
         {
           "pattern": "AAGCCCAATA",
@@ -229,219 +229,7 @@
     },
     {
       "benchmark_type": "real_dataset",
-      "files_processed": 5,
-      "results": [
-        {
-          "filename": "GCA_000005845.2_ASM584v2_genomic.fna",
-          "sequence_length": 4641652,
-          "patterns": [
-            {
-              "pattern": "ATGCATGC",
-              "matches": 27,
-              "time_ms": 574.9926567077637,
-              "first_match_pos": 147018
-            },
-            {
-              "pattern": "GCTAGCTA",
-              "matches": 9,
-              "time_ms": 607.5365543365479,
-              "first_match_pos": 1021885
-            },
-            {
-              "pattern": "TATAAA",
-              "matches": 1164,
-              "time_ms": 413.23089599609375,
-              "first_match_pos": 7610
-            },
-            {
-              "pattern": "CAAT",
-              "matches": 20936,
-              "time_ms": 670.2077388763428,
-              "first_match_pos": 25
-            },
-            {
-              "pattern": "GAATTC",
-              "matches": 646,
-              "time_ms": 541.5127277374268,
-              "first_match_pos": 3841
-            },
-            {
-              "pattern": "GGATCC",
-              "matches": 494,
-              "time_ms": 664.4325256347656,
-              "first_match_pos": 6059
-            }
-          ]
-        },
-        {
-          "filename": "GCA_000269645.2_PB_Esch_coli_MG12655_V1_genomic.fna",
-          "sequence_length": 4638970,
-          "patterns": [
-            {
-              "pattern": "ATGCATGC",
-              "matches": 27,
-              "time_ms": 580.1925659179688,
-              "first_match_pos": 138784
-            },
-            {
-              "pattern": "GCTAGCTA",
-              "matches": 9,
-              "time_ms": 588.813066482544,
-              "first_match_pos": 793074
-            },
-            {
-              "pattern": "TATAAA",
-              "matches": 1164,
-              "time_ms": 413.4998321533203,
-              "first_match_pos": 9842
-            },
-            {
-              "pattern": "CAAT",
-              "matches": 20927,
-              "time_ms": 663.5515689849854,
-              "first_match_pos": 48
-            },
-            {
-              "pattern": "GAATTC",
-              "matches": 645,
-              "time_ms": 540.9600734710693,
-              "first_match_pos": 883
-            },
-            {
-              "pattern": "GGATCC",
-              "matches": 494,
-              "time_ms": 658.8661670684814,
-              "first_match_pos": 3219
-            }
-          ]
-        },
-        {
-          "filename": "GCA_000273425.1_Esch_coli_MG12655_V1_genomic.fna",
-          "sequence_length": 4638970,
-          "patterns": [
-            {
-              "pattern": "ATGCATGC",
-              "matches": 27,
-              "time_ms": 576.5225887298584,
-              "first_match_pos": 147018
-            },
-            {
-              "pattern": "GCTAGCTA",
-              "matches": 9,
-              "time_ms": 589.7319316864014,
-              "first_match_pos": 1021109
-            },
-            {
-              "pattern": "TATAAA",
-              "matches": 1164,
-              "time_ms": 413.32077980041504,
-              "first_match_pos": 7610
-            },
-            {
-              "pattern": "CAAT",
-              "matches": 20927,
-              "time_ms": 662.7933979034424,
-              "first_match_pos": 25
-            },
-            {
-              "pattern": "GAATTC",
-              "matches": 645,
-              "time_ms": 543.8225269317627,
-              "first_match_pos": 3841
-            },
-            {
-              "pattern": "GGATCC",
-              "matches": 494,
-              "time_ms": 670.7727909088135,
-              "first_match_pos": 6059
-            }
-          ]
-        },
-        {
-          "filename": "GCA_000364365.1_ASM36436v1_genomic.fna",
-          "sequence_length": 7580,
-          "patterns": [
-            {
-              "pattern": "ATGCATGC",
-              "matches": 0,
-              "time_ms": 1.0030269622802734,
-              "first_match_pos": -1
-            },
-            {
-              "pattern": "GCTAGCTA",
-              "matches": 0,
-              "time_ms": 1.1119842529296875,
-              "first_match_pos": -1
-            },
-            {
-              "pattern": "TATAAA",
-              "matches": 2,
-              "time_ms": 1.0099411010742188,
-              "first_match_pos": 1792
-            },
-            {
-              "pattern": "CAAT",
-              "matches": 17,
-              "time_ms": 0.9253025054931641,
-              "first_match_pos": 489
-            },
-            {
-              "pattern": "GAATTC",
-              "matches": 2,
-              "time_ms": 1.9555091857910156,
-              "first_match_pos": 39
-            },
-            {
-              "pattern": "GGATCC",
-              "matches": 1,
-              "time_ms": 1.4414787292480469,
-              "first_match_pos": 6127
-            }
-          ]
-        },
-        {
-          "filename": "GCA_000482265.1_EC_K12_MG1655_Broad_SNP_genomic.fna",
-          "sequence_length": 4638920,
-          "patterns": [
-            {
-              "pattern": "ATGCATGC",
-              "matches": 27,
-              "time_ms": 578.9966583251953,
-              "first_match_pos": 147018
-            },
-            {
-              "pattern": "GCTAGCTA",
-              "matches": 9,
-              "time_ms": 594.9411392211914,
-              "first_match_pos": 1021109
-            },
-            {
-              "pattern": "TATAAA",
-              "matches": 1164,
-              "time_ms": 411.01670265197754,
-              "first_match_pos": 7610
-            },
-            {
-              "pattern": "CAAT",
-              "matches": 20927,
-              "time_ms": 665.654182434082,
-              "first_match_pos": 25
-            },
-            {
-              "pattern": "GAATTC",
-              "matches": 645,
-              "time_ms": 544.381856918335,
-              "first_match_pos": 3841
-            },
-            {
-              "pattern": "GGATCC",
-              "matches": 494,
-              "time_ms": 659.2915058135986,
-              "first_match_pos": 6059
-            }
-          ]
-        }
-      ]
+      "status": "skipped"
     }
   ]
 }
