@@ -2,9 +2,6 @@
 Quick Test Script for Boyer-Moore Algorithm
 
 A simple script to quickly verify the implementation is working correctly.
-
-Author: DNA Pattern Matching Project
-Date: November 2025
 """
 
 import sys

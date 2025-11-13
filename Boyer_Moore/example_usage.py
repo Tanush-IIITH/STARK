@@ -3,9 +3,6 @@ Example Usage of Boyer-Moore Algorithm for DNA Pattern Matching
 
 This script demonstrates various use cases and features of the Boyer-Moore
 implementation for DNA sequence analysis.
-
-Author: DNA Pattern Matching Project
-Date: November 2025
 """
 
 import os

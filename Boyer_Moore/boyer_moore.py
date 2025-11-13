@@ -4,9 +4,6 @@ Boyer-Moore String Matching Algorithm for DNA Sequences
 This module implements the Boyer-Moore exact pattern matching algorithm from scratch,
 optimized for DNA sequence analysis. The implementation includes both the Bad Character
 Rule and the Good Suffix Rule for efficient string matching.
-
-Author: DNA Pattern Matching Project
-Date: November 2025
 """
 
 from typing import List, Tuple, Dict

@@ -28,10 +28,9 @@ def search_in_real_genome():
     print("SEARCHING IN REAL E. COLI GENOME SEQUENCES")
     print("="*70)
     
-    # Get the dataset path
+    # Get the dataset path 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    dataset_path = os.path.join(script_dir, '..', 'STARK', 'Suffix Arrays-Trees', 
-                                 'DnA_dataset', 'ncbi_dataset', 'data')
+    dataset_path = os.path.abspath(os.path.join(script_dir, '..', 'DnA_dataset', 'ncbi_dataset', 'data'))
     
     if not os.path.exists(dataset_path):
         print(f"\nDataset not found at: {dataset_path}")

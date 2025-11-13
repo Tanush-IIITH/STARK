@@ -3,9 +3,6 @@ Benchmarking and Testing Harness for Boyer-Moore Algorithm
 
 This module provides comprehensive testing and benchmarking capabilities
 for the Boyer-Moore string matching algorithm on DNA sequences.
-
-Author: DNA Pattern Matching Project
-Date: November 2025
 """
 
 import time

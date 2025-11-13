@@ -143,7 +143,7 @@ Computing the good suffix table involves:
 \subsubsection{Total Preprocessing}
 
 \begin{equation}
-\boxed{T_{\text{preprocess}} = O(m + |\Sigma|) = O(m) \text{ for DNA}}
+\boxed{C_{\text{preprocess}} = O(m + |\Sigma|) = O(m) \text{ for DNA}}
 \end{equation}
 
 \begin{equation}
@@ -237,24 +237,107 @@ Assume the algorithm misses a match at position $k$. This can occur only if:
 
 \textbf{Case 1}: Suppose the pattern is at position $i < k$ and shifts past $k$.
 
-Let $j$ be the position where mismatch occurs. The shift is:
+Let $j$ be the position where mismatch occurs, and let $C = T[i+j]$ be the mismatched character. The shift is:
 \begin{equation}
-s = \max\{\delta_1(T[i+j], j), \delta_2(j)\}
+s = \max\{\delta_1(C, j), \delta_2(j)\}
 \end{equation}
 
-By construction:
+We assume $s > k - i$, meaning the algorithm skips position $k$. We will show this leads to a contradiction for both heuristics.
+
+\subsubsection*{Contradiction for Bad Character Rule ($\delta_1$)}
+
+\textbf{Step 1: Using the Hypothetical Match}
+
+If a full match of $P$ exists at position $k$, then every character in $P$ must match the corresponding character in $T$. In particular, the character at absolute text position $i+j$ must match some pattern character:
+
+\begin{equation}
+T[i+j] = P[x] \quad \text{where} \quad x = i+j-k
+\end{equation}
+
+This means the character $C = T[i+j]$ (which caused the mismatch at index $j$ in alignment $i$) also appears within the pattern $P$ at index $x = i+j-k$ to enable the match at $k$.
+
+\textbf{Step 2: Relating the Indices}
+
+The Boyer-Moore algorithm uses $\delta_1$ to find the rightmost occurrence of $C$ in $P$ that is at or to the left of index $j-1$. Let $x_{\text{rightmost}}$ be the index of this rightmost occurrence. By definition of the Bad Character Rule, the shift is calculated to align $P[x_{\text{rightmost}}]$ with $T[i+j]$:
+
+\begin{equation}
+\delta_1(C, j) = j - x_{\text{rightmost}}
+\end{equation}
+
+The key safety property of $\delta_1$ is that any smaller shift would result in $C$ being compared against a character in $P$ that is not $C$, thus leading to a guaranteed mismatch at the new position.
+
+\textbf{Step 3: The Contradiction}
+
+If $P[x]$ is the required pattern character for the match at $k$, then the shift necessary to align the pattern at $k$ is:
+
+\begin{equation}
+\text{Required Shift} = k - i
+\end{equation}
+
+Since we assumed the pattern was skipped (i.e., $s > k - i$), and if $\delta_1$ was the governing shift (meaning $\delta_1 \geq \delta_2$), then $s = \delta_1$:
+
+\begin{align}
+\delta_1 &> k - i \\
+j - x_{\text{rightmost}} &> k - i \\
+j - (k - i) &> x_{\text{rightmost}} \\
+i + j - k &> x_{\text{rightmost}}
+\end{align}
+
+Since $x = i + j - k$, this means:
+\begin{equation}
+\boxed{x > x_{\text{rightmost}}}
+\end{equation}
+
+But this is a \textbf{contradiction}! We have:
 \begin{itemize}
-    \item $\delta_1$ shifts to align with the rightmost occurrence of the mismatched character
-    \item $\delta_2$ shifts to align with another occurrence of the matched suffix
+    \item $x$ is the index of $C$ that enables the hypothetical match at $k$
+    \item $x_{\text{rightmost}}$ is the index of the rightmost occurrence of $C$ used to calculate $\delta_1$
+    \item Since $x > x_{\text{rightmost}}$, the occurrence of $C$ at index $x$ is \textit{further to the right} than the occurrence used to calculate the $\delta_1$ shift
 \end{itemize}
 
-If there is a match at $k$ where $i < k < i + s$, then either:
+This contradicts the definition of $x_{\text{rightmost}}$ as the \textit{rightmost} occurrence of $C$ in $P[0..j-1]$. Therefore, no match can exist at position $k$ when $\delta_1$ governs the shift.
+
+\subsubsection*{Contradiction for Good Suffix Rule ($\delta_2$)}
+
+Now suppose $\delta_2$ governs the shift (i.e., $\delta_2 > \delta_1$), so $s = \delta_2(j)$.
+
+After the mismatch at position $j$, the algorithm has successfully matched a suffix of the pattern: $P[j+1..m-1]$ matches $T[i+j+1..i+m-1]$. The good suffix rule $\delta_2(j)$ shifts the pattern to align with:
+\begin{enumerate}
+    \item Another occurrence of the suffix $P[j+1..m-1]$ in $P$ preceded by a different character, OR
+    \item The longest prefix of $P$ that matches a suffix of $P[j+1..m-1]$
+\end{enumerate}
+
+If a match exists at position $k$ where $i < k < i + \delta_2(j)$, then:
+
+\begin{equation}
+P[0..m-1] = T[k..k+m-1]
+\end{equation}
+
+In particular, the suffix portion must match:
+\begin{equation}
+P[j+1..m-1] = T[k+j+1..k+m-1]
+\end{equation}
+
+But we already know from the comparison at position $i$ that:
+\begin{equation}
+P[j+1..m-1] = T[i+j+1..i+m-1]
+\end{equation}
+
+This implies that the same suffix $P[j+1..m-1]$ appears in the text at two overlapping positions: starting at $i+j+1$ and at $k+j+1$. By the definition of $\delta_2$, the shift is calculated to align the pattern with the \textit{nearest} valid occurrence of this suffix (accounting for the preceding character constraint).
+
+If $k - i < \delta_2(j)$, then there exists a valid suffix occurrence closer than what $\delta_2$ computed, which contradicts the minimality property of $\delta_2$. Specifically:
 \begin{itemize}
-    \item The character at $T[i+j]$ must appear at position $k + j - i$ in $P$, contradicting the definition of $\delta_1$
-    \item The suffix matched at $i$ must also occur at $k$, contradicting the definition of $\delta_2$
+    \item Either the suffix $P[j+1..m-1]$ occurs at an earlier position in $P$ with a different preceding character (contradicting that $\delta_2$ found the nearest such occurrence)
+    \item Or a longer prefix of $P$ matches a suffix of $P[j+1..m-1]$ (contradicting that $\delta_2$ found the longest such prefix)
 \end{itemize}
 
-Therefore, no match can exist at $i < k < i + s$. \textbf{Contradiction.}
+Furthermore, the good suffix rule is designed to handle \textbf{overlapping patterns} correctly. When a match is found, the algorithm shifts by $\delta_2(0)$, which ensures that any overlapping occurrences are not missed. The shift $\delta_2(0)$ is the minimum safe shift that aligns the entire pattern with its longest proper suffix, thus catching all overlapping matches.
+
+Therefore, no match can exist at position $k$ when $\delta_2$ governs the shift. \textbf{Contradiction.}
+
+\vspace{0.5cm}
+
+Since both $\delta_1$ and $\delta_2$ lead to contradictions, no match can exist at $i < k < i + s$.
 
 \textbf{Case 2}: If the algorithm aligns at position $k$, it performs right-to-left comparison:
 
@@ -279,23 +362,6 @@ Therefore, the algorithm cannot miss a match at any aligned position.
 \end{itemize}
 
 \textbf{Termination}: When $i + m > n$, all positions have been checked.
-
-\subsection{Correctness of Heuristics}
-
-\subsubsection{Bad Character Correctness}
-
-If $T[i+j] = c$ and $c$ does not appear in $P[0..j-1]$, then no match can exist with $c$ aligned to any position in $P[0..j-1]$. Safe to shift past $c$.
-
-\subsubsection{Good Suffix Correctness}
-
-If suffix $P[j+1..m-1]$ matched in $T$, but $P[j] \neq T[i+j]$:
-\begin{itemize}
-    \item Any match must have the same suffix
-    \item The suffix must occur elsewhere in $P$ with a different preceding character
-    \item Or a prefix of $P$ must match the suffix
-\end{itemize}
-
-The good suffix table ensures we shift to the nearest such position.
 
 \clearpage
 \section{Pseudocode}
@@ -427,7 +493,7 @@ C & -1 & -1 & -1 & -1 & -1 & 5 \\
 \caption{Bad character table for ``GAATTC''}
 \end{table}
 
-\textbf{Good Suffix Table}: $\delta_2 = [6, 6, 6, 6, 2, 1]$
+\textbf{Good Suffix Table}: $\delta_2 = [6, 6, 6, 6, 6, 1]$
 
 \subsubsection{Search Process}
 
@@ -446,28 +512,11 @@ Compare: $P[4] = $ ``T'' vs $T[4] = $ ``A'' \textbf{X MISMATCH}
 
 Bad char shift: ``A'' at position 2, shift = $4 - 2 = 2$
 
-Good suffix shift: $\delta_2[4] = 2$
+Good suffix shift: $\delta_2[4] = 6$
 
-\textbf{Shift} = $\max(2, 2) = 2$
+\textbf{Shift} = $\max(2, 6) = 6$
 
-\textbf{Alignment 2} ($i = 2$):
-\begin{verbatim}
-Text:    A C G T A C G G A T G C G A A T T C A G T A C G
-Pattern:     G A A T T C
-             -----------
-             ^
-Position:    0 1 2 3 4 5
-\end{verbatim}
-
-Compare: $P[5] = $ ``C'' vs $T[7] = $ ``G'' \textbf{X MISMATCH}
-
-Bad char shift: ``G'' at position 0, shift = $5 - 0 = 5$
-
-Good suffix shift: $\delta_2[5] = 1$
-
-\textbf{Shift} = $\max(5, 1) = 5$
-
-\textbf{Alignment 3} ($i = 7$):
+\textbf{Alignment 2} ($i = 6$):
 \begin{verbatim}
 Text:    A C G T A C G G A T G C G A A T T C A G T A C G
 Pattern:             G A A T T C
@@ -476,11 +525,17 @@ Pattern:             G A A T T C
 Position:            0 1 2 3 4 5
 \end{verbatim}
 
-Compare: $P[5] = $ ``C'' vs $T[12] = $ ``G'' \textbf{X MISMATCH}
+Compare: $P[5] = $ ``C'' vs $T[11] = $ ``C'' \checkmark
 
-Shift = 5 (similar to above)
+Compare: $P[4] = $ ``T'' vs $T[10] = $ ``G'' \textbf{X MISMATCH}
 
-\textbf{Alignment 4} ($i = 12$):
+Bad char shift: ``G'' at position 0, shift = $4 - 0 = 4$
+
+Good suffix shift: $\delta_2[4] = 6$
+
+\textbf{Shift} = $\max(4, 6) = 6$
+
+\textbf{Alignment 3} ($i = 12$):
 \begin{verbatim}
 Text:    A C G T A C G G A T G C G A A T T C A G T A C G
 Pattern:                         G A A T T C
@@ -505,15 +560,14 @@ Compare right to left:
 
 \begin{enumerate}
     \item \textbf{Right-to-left scanning} detected mismatches quickly
-    \item \textbf{Large shifts} (2, 5, 5 positions) skipped impossible alignments
-    \item \textbf{Only 4 alignments} checked instead of 19 (naive approach)
-    \item \textbf{Total comparisons}: $\sim$10 instead of $\sim$114 (naive)
+    \item \textbf{Large shifts} (6, 6 positions) skipped impossible alignments efficiently
+    \item \textbf{Only 3 alignments} checked instead of 19 (naive approach)
+    \item \textbf{Total comparisons}: $\sim$8 instead of $\sim$114 (naive)
+    \item \textbf{Good suffix rule} dominated the shift calculations, demonstrating its effectiveness
 \end{enumerate}
 
 \clearpage
 \section{Graphical Visualization}
-
-\subsection{Algorithm Flow Diagram}
 
 \begin{figure}[!htb]
 \centering
@@ -558,54 +612,6 @@ Compare right to left:
 \end{tikzpicture}
 \caption{Boyer-Moore algorithm flowchart}
 \label{fig:flowchart}
-\end{figure}
-
-\subsection{Shift Visualization}
-
-\begin{figure}[!htb]
-\centering
-\begin{tikzpicture}[scale=1.0]
-    % Text sequence
-    \node at (-2, 0) {\textbf{Text:}};
-    \foreach \i/\c in {0/A,1/C,2/G,3/T,4/A,5/C,6/G,7/G,8/A,9/T,10/G,11/C,12/G,13/A,14/A,15/T,16/T,17/C} {
-        \node at (\i*0.5, 0) {\small \c};
-        \draw (\i*0.5-0.2, -0.25) rectangle (\i*0.5+0.2, 0.25);
-    }
-    
-    % Pattern alignment 1
-    \node at (-2, -1.5) {\textbf{Align 1:}};
-    \foreach \i/\c in {0/G,1/A,2/A,3/T,4/T,5/C} {
-        \node at (\i*0.5, -1.5) {\small \c};
-        \draw[red, very thick] (\i*0.5-0.2, -1.75) rectangle (\i*0.5+0.2, -1.25);
-    }
-    \draw[->, very thick, red] (3*0.5, -2.0) -- node[right, xshift=0.2cm] {\small Shift by 2} (3*0.5, -2.5);
-    
-    % Pattern alignment 2
-    \node at (-2, -3.5) {\textbf{Align 2:}};
-    \foreach \i/\c in {0/G,1/A,2/A,3/T,4/T,5/C} {
-        \node at ((\i+2)*0.5, -3.5) {\small \c};
-        \draw[blue, very thick] ((\i+2)*0.5-0.2, -3.75) rectangle ((\i+2)*0.5+0.2, -3.25);
-    }
-    \draw[->, very thick, blue] (5*0.5, -4.0) -- node[right, xshift=0.2cm] {\small Shift by 5} (5*0.5, -4.5);
-    
-    % Pattern alignment 3 (skipped alignments)
-    \node at (-2, -5.5) {\textbf{Align 3:}};
-    \foreach \i/\c in {0/G,1/A,2/A,3/T,4/T,5/C} {
-        \node at ((\i+7)*0.5, -5.5) {\small \c};
-        \draw[orange, very thick] ((\i+7)*0.5-0.2, -5.75) rectangle ((\i+7)*0.5+0.2, -5.25);
-    }
-    \draw[->, very thick, orange] (8.5*0.5, -6.0) -- node[right, xshift=0.2cm] {\small Shift by 5} (8.5*0.5, -6.5);
-    
-    % Pattern alignment 4 (match found)
-    \node at (-2, -7.5) {\textbf{Align 4:}};
-    \foreach \i/\c in {0/G,1/A,2/A,3/T,4/T,5/C} {
-        \node at ((\i+12)*0.5, -7.5) {\small \c};
-        \draw[green!60!black, very thick] ((\i+12)*0.5-0.2, -7.75) rectangle ((\i+12)*0.5+0.2, -7.25);
-    }
-    \node at (15*0.5, -8.3) {\color{green!60!black} \Large \textbf{MATCH!}};
-\end{tikzpicture}
-\caption{Visualization of pattern shifts during search}
-\label{fig:shifts}
 \end{figure}
 
 \clearpage

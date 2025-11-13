@@ -3,9 +3,6 @@ Utility Functions for DNA Sequence Processing
 
 This module provides helper functions for reading and processing DNA sequences
 from FASTA files and other formats commonly used in bioinformatics.
-
-Author: DNA Pattern Matching Project
-Date: November 2025
 """
 
 import os
