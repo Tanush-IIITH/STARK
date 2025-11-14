@@ -20,40 +20,10 @@ This project implements the **Boyer-Moore algorithm** for exact pattern matching
 - ✅ **Well-documented code** with docstrings for all functions
 - ✅ **Utility functions** for DNA sequence processing
 
-## Project Structure
-
-```
-Boyer_Moore/
-├── boyer_moore.py          # Core Boyer-Moore algorithm implementation
-├── utils.py                # DNA sequence processing utilities
-├── benchmark.py            # Testing and benchmarking harness
-├── README.md               # This file
-├── requirements.txt        # Python dependencies
-├── example_usage.py        # Example usage demonstrations
-└── benchmark_results.json  # Generated benchmark results
-```
-
 ## Requirements
 
 - Python 3.7 or higher
 - No external dependencies required (uses only standard library)
-
-## Installation
-
-1. **Clone or download the project:**
-   ```bash
-   cd c:\Users\user\AAD_project\Boyer_Moore
-   ```
-
-2. **Install dependencies (optional - only standard library is used):**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Verify installation:**
-   ```bash
-   python -c "from boyer_moore import BoyerMoore; print('Installation successful!')"
-   ```
 
 ## Usage
 
@@ -124,31 +94,6 @@ stats = bm.get_statistics()
 print(f"Pattern: {stats['pattern']}")
 print(f"Pattern length: {stats['pattern_length']}")
 ```
-
-## Running Tests and Benchmarks
-
-### Run the Complete Benchmark Suite
-
-```bash
-python benchmark.py
-```
-
-This will:
-- Run basic functionality tests
-- Test edge cases
-- Benchmark performance with varying pattern lengths
-- Benchmark performance with varying text lengths
-- Test on real DNA sequences from the dataset (if available)
-- Generate a `benchmark_results.json` file with detailed results
-
-### Run Example Usage Script
-
-```bash
-python example_usage.py
-```
-
-This demonstrates various usage patterns and features of the implementation.
-
 ## Algorithm Details
 
 ### Time Complexity
@@ -233,23 +178,6 @@ Typical results on modern hardware:
 - Sub-millisecond search for 100K bp sequences
 - Linear scaling with text length
 
-## Testing
-
-The implementation includes comprehensive tests:
-
-```bash
-# Run all tests
-python benchmark.py
-```
-
-Test categories:
-- ✅ Simple matches
-- ✅ No matches
-- ✅ Overlapping matches
-- ✅ Edge cases (single character, pattern longer than text, etc.)
-- ✅ Case insensitivity
-- ✅ Ambiguous bases (N)
-
 ## Example Applications
 
 ### Finding Restriction Enzyme Sites
@@ -298,37 +226,3 @@ caat_positions = caat_box.search(sequence)
 - This implementation focuses on **exact matching** only
 - For approximate matching (with mismatches), use the `find_approximate_matches()` function which uses a different approach
 - Very short patterns (< 3 bp) may not show significant performance advantage over naive search
-
-## Authors
-
-DNA Pattern Matching Project Team
-
-## License
-
-This project is created for educational purposes as part of an algorithms course.
-
-## References
-
-- Boyer, R. S., & Moore, J. S. (1977). A fast string searching algorithm. Communications of the ACM, 20(10), 762-772.
-- DNA sequence data from NCBI Genome Database
-
-## Troubleshooting
-
-### Import Errors
-
-If you get import errors, make sure you're in the correct directory:
-```bash
-cd c:\Users\user\AAD_project\Boyer_Moore
-python benchmark.py
-```
-
-### Dataset Not Found
-
-If the benchmark can't find the DNA dataset, update the path in `benchmark.py`:
-```python
-dataset_path = "path/to/your/dataset"
-```
-
-## Contact
-
-For questions or issues, please refer to the project documentation or course materials.
