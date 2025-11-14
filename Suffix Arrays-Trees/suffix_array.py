@@ -9,7 +9,7 @@ explicit commentary so that each stage of the algorithm remains easy to trace.
 from __future__ import annotations
 
 import time
-from typing import Callable, List
+from typing import Callable, Iterable, List
 
 
 def brute_force_suffix_array(text: str) -> List[int]:
@@ -64,10 +64,36 @@ def manber_myers_suffix_array(text: str) -> List[int]:
 	rank = [ord(ch) for ch in text]
 
 	k = 1
+	def counting_sort(indices: Iterable[int], key_fn: Callable[[int], int], key_range: int) -> List[int]:
+		"""Stable counting sort specialised for suffix indices."""
+
+		indices_list = list(indices)
+		counts = [0] * key_range
+		for idx in indices_list:
+			counts[key_fn(idx)] += 1
+
+		for i in range(1, key_range):
+			counts[i] += counts[i - 1]
+
+		output = [0] * len(indices_list)
+		for idx in reversed(indices_list):
+			key = key_fn(idx)
+			counts[key] -= 1
+			output[counts[key]] = idx
+		return output
+
 	while k < n:
-		# Sort suffix indices by (rank, rank at offset k).  Python's Timsort
-		# handles this in-place, ensuring stability without extra allocation.
-		suffix_array.sort(key=lambda idx: (rank[idx], rank[idx + k] if idx + k < n else -1))
+		max_rank = max(rank)
+
+		# Sort by the second half (rank at idx + k).  The sentinel -1 is mapped to 0.
+		second_key_range = max_rank + 2
+		second_key = lambda idx: (rank[idx + k] + 1) if idx + k < n else 0
+		suffix_array = counting_sort(suffix_array, second_key, second_key_range)
+
+		# Sort by the first half (current rank).
+		first_key_range = max_rank + 1
+		first_key = lambda idx: rank[idx]
+		suffix_array = counting_sort(suffix_array, first_key, first_key_range)
 
 		new_rank = [0] * n
 		new_rank[suffix_array[0]] = 0
