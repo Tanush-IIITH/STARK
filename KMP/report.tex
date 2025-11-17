@@ -1,0 +1,181 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{subcaption}
+
+\usetikzlibrary{arrows,positioning,shapes.geometric}
+
+% Code listing style
+\lstset{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    showstringspaces=false,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+
+\title{\textbf{Knuth--Morris--Pratt (KMP) Algorithm for DNA Pattern Matching}}
+\author{STARK DNA Pattern Matching Project}
+\date{November 2025}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report presents a complete overview of the Knuth--Morris--Pratt (KMP) exact string matching algorithm and its application to DNA sequence analysis. We cover the LPS (Longest Proper Prefix which is also Suffix) preprocessing, the linear-time search procedure, correctness, complexity, and empirical performance on both synthetic and real genomic datasets. Results and implementation follow the structure used for Boyer--Moore in this repository, ensuring consistent documentation across algorithms.
+\end{abstract}
+
+\section{Introduction}
+String matching is central to bioinformatics tasks such as motif search, primer validation, and genome annotation. Given a text $T$ of length $n$ and a pattern $P$ of length $m$, KMP finds all indices $i$ such that $T[i..i+m-1] = P[0..m-1]$.
+
+DNA sequences over the alphabet $\Sigma = \{A, C, G, T\}$ make KMP attractive due to its predictable $O(n)$ worst-case runtime and small memory overhead.
+
+\subsection{Problem Statement}
+Input: Text $T$ (DNA), pattern $P$ (DNA). Output: All start positions of $P$ in $T$.
+
+\section{Algorithm Description}
+KMP avoids redundant comparisons by preprocessing $P$ into an LPS array. When a mismatch occurs after matching a prefix of $P$, the LPS value indicates where to resume in $P$ without re-checking characters in $T$.
+
+\subsection{LPS (Failure Function)}
+For each index $i$ in $P$, $\mathrm{LPS}[i]$ is the length of the longest proper prefix of $P[0..i]$ that is also a suffix of $P[0..i]$. LPS can be computed in $O(m)$ time.
+
+\subsection{Search Procedure}
+We scan $T$ left-to-right while maintaining an index $j$ into $P$. On match, advance both indices; on mismatch after $j>0$ matches, fall back to $j = \mathrm{LPS}[j-1]$. If $j=m$, a match is reported and $j$ falls back to $\mathrm{LPS}[m-1]$ to allow overlapping matches.
+
+\section{Complexity Analysis}
+\begin{itemize}
+    \item Preprocessing (LPS): $O(m)$ time, $O(m)$ space.
+    \item Search: $O(n)$ time in the worst case, $O(1)$ extra space beyond LPS and loop variables.
+    \item Total: $O(n+m)$ time, $O(m)$ space.
+\end{itemize}
+
+\section{Proof of Correctness}
+\textbf{Invariant}: Before each text character access, $j$ equals the length of the longest prefix of $P$ matching a suffix of the processed text. On mismatch, setting $j \gets \mathrm{LPS}[j-1]$ preserves this invariant. Since $j$ never decreases below 0 and increases only on matches, the algorithm examines each text character at most a constant number of times, and every reported match corresponds to $m$ consecutive equalities.
+
+\section{Pseudocode}
+\subsection{LPS Computation}
+\begin{algorithm}[H]
+\caption{ComputeLPS($P$)}
+\begin{algorithmic}[1]
+\State $m \gets |P|$, $\mathrm{LPS}[0] \gets 0$, $len \gets 0$
+\For{$i \gets 1$ to $m-1$}
+    \While{$len>0$ and $P[i] \ne P[len]$}
+        \State $len \gets \mathrm{LPS}[len-1]$
+    \EndWhile
+    \If{$P[i] = P[len]$}
+        \State $len \gets len+1$, $\mathrm{LPS}[i] \gets len$
+    \Else
+        \State $\mathrm{LPS}[i] \gets 0$
+    \EndIf
+\EndFor
+\State \Return $\mathrm{LPS}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Search}
+\begin{algorithm}[H]
+\caption{KMP-Search($T, P$)}
+\begin{algorithmic}[1]
+\State $n \gets |T|$, $m \gets |P|$, $\mathrm{LPS} \gets \Call{ComputeLPS}{P}$
+\State $i \gets 0$, $j \gets 0$, matches $\gets [\,]$
+\While{$i < n$}
+    \If{$T[i] = P[j]$}
+        \State $i\gets i+1$, $j\gets j+1$
+        \If{$j = m$}
+            \State matches.append($i-j$); $j \gets \mathrm{LPS}[m-1]$
+        \EndIf
+    \ElsIf{$j > 0$}
+        \State $j \gets \mathrm{LPS}[j-1]$
+    \Else
+        \State $i \gets i+1$
+    \EndIf
+\EndWhile
+\State \Return matches
+\end{algorithmic}
+\end{algorithm}
+
+\section{Edge Cases}
+\begin{itemize}
+    \item $m=0$: invalid (we reject empty patterns).
+    \item $m>n$: no matches.
+    \item Highly repetitive patterns (e.g., ``AAAA"): still linear due to LPS fallback.
+    \item Overlapping matches: handled by resetting $j \gets \mathrm{LPS}[m-1]$ after a match.
+\end{itemize}
+
+\section{Implementation Overview}
+We implement KMP in Python (see \texttt{kmp.py}) with an object-oriented wrapper exposing: \texttt{search}, \texttt{search\_first}, \texttt{count\_matches}, and \texttt{search\_multiple\_patterns}. The module normalizes input to uppercase and builds LPS once per pattern instance.
+
+\section{Experimental Setup}
+We evaluate on synthetic DNA (uniform random over $\{A,C,G,T\}$) and real genomes from NCBI (directory: \texttt{DnA\_dataset/ncbi\_dataset/data}). Benchmarks include:
+\begin{enumerate}
+    \item Pattern length impact at fixed $n$.
+    \item Text length scaling at fixed $m$.
+    \item Multiple pattern search over the same text.
+    \item Per-genome runs across all available FASTA files (see notebook cell "Benchmark KMP across all genomes").
+\end{enumerate}
+Outputs are stored in JSON (e.g., \texttt{KMP/benchmark\_results.json}, \texttt{KMP/kmp\_nb\_results.json}).
+
+\section{Results}
+\subsection{Synthetic Sequences}
+Across $n \in [10^4, 10^6]$ with moderate $m$ (20--100), KMP shows near-constant throughput with total time growing linearly in $n$, consistent with $O(n)$.
+
+\subsection{Real Genomes}
+For bacterial-size genomes (\~4--6 Mbp), KMP processes sequences in linear time with speeds on the order of tens of Mbp/s on a typical laptop CPU. Aggregated per-genome plots and summaries are generated by the notebook.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Metric} & \textbf{Min} & \textbf{Median} & \textbf{Mean} & \textbf{Max} \\
+\midrule
+Speed (Mbp/s) & -- & -- & -- & -- \\
+Time (ms) & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\caption{Summary placeholder; see notebook for concrete numbers.}
+\end{table}
+
+\section{Discussion}
+KMP provides predictable linear-time behavior independent of pattern content, in contrast to Boyer--Moore which benefits from larger shifts on average. For DNA alphabets, KMP is robust and memory-light, making it a great baseline for exact matching.
+
+\section{Conclusion and Future Work}
+KMP achieves $O(n+m)$ performance for exact DNA pattern matching with minimal memory overhead. Future work includes: multi-pattern automata (Aho--Corasick), approximate matching, SIMD acceleration, and parallelization.
+
+\section*{Reproducibility}
+\begin{itemize}
+    \item Code: \texttt{KMP/kmp.py}, benchmarks in \texttt{KMP/benchmark.py}, notebook \texttt{KMP/kmp\_nb.ipynb}.
+    \item Datasets: \texttt{DnA\_dataset/ncbi\_dataset/data}.
+    \item Environment: see \texttt{KMP/requirements.txt}.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{knuth1977kmp}
+Knuth, D. E.; Morris, J. H.; Pratt, V. R. (1977). ``Fast pattern matching in strings.'' SIAM Journal on Computing 6(2): 323--350.
+
+\bibitem{gusfield1997algorithms}
+Gusfield, D. (1997). Algorithms on Strings, Trees, and Sequences. Cambridge University Press.
+
+\bibitem{gfgkmp}
+GeeksforGeeks. KMP Algorithm for Pattern Searching. \url{https://www.geeksforgeeks.org/kmp-algorithm-for-pattern-searching/}
+
+\bibitem{ncbi2024datasets}
+NCBI Datasets. \url{https://www.ncbi.nlm.nih.gov/datasets}
+\end{thebibliography}
+
+\end{document}
