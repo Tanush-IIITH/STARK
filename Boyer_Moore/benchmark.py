@@ -1,218 +1,345 @@
-"""Benchmarking for Boyer-Moore on real DNA datasets.
-
-This script:
-- Discovers a genome FASTA/FNA file under STARK/DnA_dataset/ncbi_dataset/data
-- Runs two analyses and writes a CSV for downstream plotting:
-  1) Varying text lengths (n): fixed pattern, measure construction time/memory and search time
-  2) Varying pattern lengths (m): fixed text, measure construction time/memory and search time
-
-It is inspired by the benchmarking structure used in the Suffix Arrays-Trees module.
-"""
+"""Benchmark Boyer–Moore against Python's regex across real and synthetic genomes."""
 
 from __future__ import annotations
 
+import argparse
 import csv
 import glob
 import os
 import random
+import re
 import time
-from typing import Dict, List, Tuple
+from dataclasses import dataclass
+from typing import List, Sequence, Tuple
 
 import psutil
 
-# Local imports from this folder
 from boyer_moore import BoyerMoore
-from utils import read_fasta_file
+from synthetic import DEFAULT_LENGTH as SYNTH_DEFAULT_LENGTH, generate_sequence
+from utils import read_fasta_single_sequence
 
 
-# Output CSV will be saved in the same directory as this script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_CSV_FILE = os.path.join(SCRIPT_DIR, "bm_benchmark_results.csv")
+DEFAULT_OUTPUT_CSV = os.path.join(SCRIPT_DIR, "bm_benchmark_results.csv")
+FASTA_EXTENSIONS = (".fna", ".fa", ".fasta", ".ffn", ".faa", ".frn")
+
+# Benchmark knobs mirror the suffix-array module for easy comparisons
+TEXT_LENGTH_BUCKETS: Sequence[int] = (
+    1_000,
+    2_000,
+    5_000,
+    10_000,
+    25_000,
+    50_000,
+    75_000,
+    100_000,
+    150_000,
+    200_000,
+)
+PATTERN_LENGTHS: Sequence[int] = (5, 10, 20, 50, 100, 200)
+FIXED_PATTERN = "GAATTC"  # EcoRI site
+MAX_PREFIX_LENGTH = 250_000
+N_FIXED_FOR_PATTERN_SWEEP = 100_000
+
+
+@dataclass
+class DatasetRecord:
+    name: str
+    group: str  # logical cohort label (e.g., "synthetic")
+    text: str
+    source_path: str | None = None
 
 
 def current_memory_bytes() -> int:
     """Return resident set size (RSS) for the current process."""
+
     process = psutil.Process(os.getpid())
     return process.memory_info().rss
 
 
-def find_first_dataset_file() -> str | None:
-    """Find a DNA FASTA/FNA file in DnA_dataset/ncbi_dataset/data (recursive).
+def discover_dataset_files(root: str, group: str) -> List[Tuple[str, str, str]]:
+    """Return (path, dataset_name, group) triples for FASTA-like files."""
 
-    Returns the first matching file path or None.
-    """
-    script_dir = os.path.dirname(__file__)
-    dataset_root = os.path.abspath(
-        os.path.join(script_dir, "..", "DnA_dataset", "ncbi_dataset", "data")
-    )
+    if not os.path.isdir(root):
+        return []
 
-    patterns = ["**/*.fna", "**/*.fa", "**/*.fasta", "**/*genomic.fna"]
-    candidates: List[str] = []
-    for pat in patterns:
-        candidates.extend(glob.glob(os.path.join(dataset_root, pat), recursive=True))
+    paths: List[str] = []
+    for ext in FASTA_EXTENSIONS:
+        pattern = os.path.join(root, "**", f"*{ext}")
+        paths.extend(glob.glob(pattern, recursive=True))
 
-    # Prefer smaller files to keep benchmarks snappy
-    candidates.sort(key=lambda p: os.path.getsize(p))
-    return candidates[0] if candidates else None
+    unique_paths = sorted({os.path.abspath(p) for p in paths})
+    return [(path, os.path.basename(path), group) for path in unique_paths]
 
 
-def parse_fasta_contiguous(filepath: str) -> str:
-    """Return the contiguous uppercase DNA string from a FASTA/FNA file."""
-    seq_parts: List[str] = []
-    with open(filepath, "r", encoding="utf-8") as fh:
-        for line in fh:
-            if line.startswith(">"):
+def load_sequence(path: str, max_prefix: int) -> str:
+    text = read_fasta_single_sequence(path).upper()
+    return text[:max_prefix]
+
+
+def ensure_synthetic_records(
+    max_prefix: int, desired: int = 2, seeds: Sequence[int] = (137, 911)
+) -> List[DatasetRecord]:
+    """Build in-memory synthetic datasets when no files are present."""
+
+    records: List[DatasetRecord] = []
+    for idx in range(min(desired, len(seeds))):
+        length = min(SYNTH_DEFAULT_LENGTH, max_prefix)
+        sequence = generate_sequence(length, seed=seeds[idx])
+        name = f"SYNTH_auto_len{length}_seed{seeds[idx]}"
+        records.append(
+            DatasetRecord(
+                name=name,
+                group="synthetic",
+                text=sequence[:max_prefix],
+                source_path=None,
+            )
+        )
+    return records
+
+
+def collect_datasets(dataset_root: str, max_files: int | None, max_prefix: int) -> List[DatasetRecord]:
+    """Load datasets from Boyer_Moore/dataset (or a custom root)."""
+
+    dataset_records: List[DatasetRecord] = []
+    dataset_candidates = discover_dataset_files(dataset_root, "synthetic")
+
+    if dataset_candidates:
+        if max_files is not None:
+            dataset_candidates = dataset_candidates[:max_files]
+        for path, name, group in dataset_candidates:
+            try:
+                text = load_sequence(path, max_prefix)
+            except FileNotFoundError:
                 continue
-            seq_parts.append(line.strip().upper())
-    return "".join(seq_parts)
+            if not text:
+                continue
+            dataset_records.append(DatasetRecord(name=name, group=group, text=text, source_path=path))
+    else:
+        dataset_records.extend(ensure_synthetic_records(max_prefix=max_prefix))
+
+    return dataset_records
 
 
 def bm_construct_and_measure(pattern: str) -> Tuple[BoyerMoore, float, int]:
-    """Construct BoyerMoore object and return (obj, time_sec, memory_bytes_delta)."""
     start_mem = current_memory_bytes()
     start = time.perf_counter()
     bm = BoyerMoore(pattern)
     elapsed = time.perf_counter() - start
     end_mem = current_memory_bytes()
-    return bm, elapsed, (end_mem - start_mem)
+    return bm, elapsed, end_mem - start_mem
 
 
-def bm_search_time(bm: BoyerMoore, text: str) -> float:
-    """Measure time to find all occurrences in text."""
+def bm_search_stats(bm: BoyerMoore, text: str) -> Tuple[float, int]:
     start = time.perf_counter()
-    _ = bm.search(text)
-    return time.perf_counter() - start
+    matches = bm.search(text)
+    elapsed = time.perf_counter() - start
+    return elapsed, len(matches)
+
+
+def python_regex_search(pattern: str, text: str) -> Tuple[float, int]:
+    start = time.perf_counter()
+    matches = re.findall(pattern, text)
+    elapsed = time.perf_counter() - start
+    return elapsed, len(matches)
 
 
 def write_header(writer: csv.writer) -> None:
-    writer.writerow([
-        "algorithm",
-        "dataset_name",
-        "text_length_n",
-        "pattern_length_m",
-        "metric_type",
-        "time_sec",
-        "memory_bytes",
-        "matches"
-    ])
+    writer.writerow(
+        [
+            "algorithm",
+            "dataset_name",
+            "dataset_group",
+            "text_length_n",
+            "pattern_length_m",
+            "metric_type",
+            "time_sec",
+            "memory_bytes",
+            "matches",
+        ]
+    )
 
 
-def benchmark_varying_text_lengths(full_text: str, dataset_name: str, writer: csv.writer) -> None:
-    """Benchmark with a fixed pattern and varying text length n."""
-    # Fixed biologically meaningful pattern (EcoRI site)
-    fixed_pattern = "GAATTC"
-    n_values = [
-        1_000,
-        2_000,
-        5_000,
-        10_000,
-        25_000,
-        50_000,
-        75_000,
-        100_000,
-        150_000,
-        200_000,
-    ]
+def benchmark_varying_text_lengths(record: DatasetRecord, writer: csv.writer) -> None:
+    usable_text = record.text
+    if not usable_text:
+        return
 
-    # Always include full length if smaller than last bucket
-    if len(full_text) < n_values[-1]:
-        n_values = [len(full_text)]
+    n_values = [n for n in TEXT_LENGTH_BUCKETS if n <= len(usable_text)]
+    if not n_values:
+        n_values = [len(usable_text)]
+    elif len(usable_text) not in n_values and len(usable_text) <= max(TEXT_LENGTH_BUCKETS):
+        n_values.append(len(usable_text))
 
-    bm, c_time, c_mem = bm_construct_and_measure(fixed_pattern)
-    # Record the construction once (pattern-only)
-    writer.writerow([
-        "boyer_moore",
-        dataset_name,
-        0,
-        len(fixed_pattern),
-        "construction",
-        c_time,
-        c_mem,
-        0,
-    ])
-
-    for n in n_values:
-        if n > len(full_text):
-            continue
-        text = full_text[:n]
-        t_time = bm_search_time(bm, text)
-        # Matches count (optional)
-        matches = len(bm.search(text))
-        writer.writerow([
+    bm, c_time, c_mem = bm_construct_and_measure(FIXED_PATTERN)
+    writer.writerow(
+        [
             "boyer_moore",
-            dataset_name,
-            n,
-            len(fixed_pattern),
-            "search",
-            t_time,
+            record.name,
+            record.group,
             0,
-            matches,
-        ])
-
-
-def benchmark_varying_pattern_lengths(full_text: str, dataset_name: str, writer: csv.writer) -> None:
-    """Benchmark with fixed text length and varying pattern length m."""
-    random.seed(42)
-    # Fix text length at up to 100k (or full length if smaller)
-    n_fixed = min(100_000, len(full_text))
-    text = full_text[:n_fixed]
-
-    pattern_lengths = [5, 10, 20, 50, 100, 200]
-
-    for m in pattern_lengths:
-        if m >= n_fixed:
-            continue
-        # Choose a deterministic slice within text for reproducibility
-        start_idx = (n_fixed // 3) % (n_fixed - m)
-        pattern = text[start_idx:start_idx + m]
-
-        bm, c_time, c_mem = bm_construct_and_measure(pattern)
-        writer.writerow([
-            "boyer_moore",
-            dataset_name,
-            n_fixed,
-            m,
+            len(FIXED_PATTERN),
             "construction",
             c_time,
             c_mem,
             0,
-        ])
+        ]
+    )
 
-        t_time = bm_search_time(bm, text)
-        matches = len(bm.search(text))
-        writer.writerow([
-            "boyer_moore",
-            dataset_name,
-            n_fixed,
-            m,
-            "search",
-            t_time,
-            0,
-            matches,
-        ])
+    for n in sorted(n_values):
+        text = usable_text[:n]
+        bm_time, bm_matches = bm_search_stats(bm, text)
+        writer.writerow(
+            [
+                "boyer_moore",
+                record.name,
+                record.group,
+                n,
+                len(FIXED_PATTERN),
+                "search",
+                bm_time,
+                0,
+                bm_matches,
+            ]
+        )
+
+        regex_time, regex_matches = python_regex_search(FIXED_PATTERN, text)
+        writer.writerow(
+            [
+                "python_regex",
+                record.name,
+                record.group,
+                n,
+                len(FIXED_PATTERN),
+                "search",
+                regex_time,
+                0,
+                regex_matches,
+            ]
+        )
+
+
+def benchmark_varying_pattern_lengths(record: DatasetRecord, writer: csv.writer) -> None:
+    if not record.text:
+        return
+
+    n_fixed = min(N_FIXED_FOR_PATTERN_SWEEP, len(record.text))
+    if n_fixed == 0:
+        return
+
+    text = record.text[:n_fixed]
+    rng = random.Random(42)
+
+    for m in PATTERN_LENGTHS:
+        if m >= n_fixed:
+            continue
+        start_idx = rng.randrange(0, n_fixed - m)
+        pattern = text[start_idx : start_idx + m]
+
+        bm, c_time, c_mem = bm_construct_and_measure(pattern)
+        writer.writerow(
+            [
+                "boyer_moore",
+                record.name,
+                record.group,
+                n_fixed,
+                m,
+                "construction",
+                c_time,
+                c_mem,
+                0,
+            ]
+        )
+
+        bm_time, bm_matches = bm_search_stats(bm, text)
+        writer.writerow(
+            [
+                "boyer_moore",
+                record.name,
+                record.group,
+                n_fixed,
+                m,
+                "search",
+                bm_time,
+                0,
+                bm_matches,
+            ]
+        )
+
+        regex_time, regex_matches = python_regex_search(pattern, text)
+        writer.writerow(
+            [
+                "python_regex",
+                record.name,
+                record.group,
+                n_fixed,
+                m,
+                "search",
+                regex_time,
+                0,
+                regex_matches,
+            ]
+        )
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Benchmark Boyer-Moore vs Python regex on genome datasets stored under Boyer_Moore/dataset"
+    )
+    parser.add_argument(
+        "--dataset-root",
+        type=str,
+        default=os.path.join(SCRIPT_DIR, "dataset"),
+        help="Directory containing FASTA/FNA files to benchmark (default: Boyer_Moore/dataset)",
+    )
+    parser.add_argument(
+        "--max-files",
+        "--max-synthetic",
+        dest="max_files",
+        type=int,
+        default=None,
+        help="Limit the number of dataset files to benchmark (default: all)",
+    )
+    parser.add_argument(
+        "--max-prefix",
+        type=int,
+        default=MAX_PREFIX_LENGTH,
+        help="Maximum number of characters loaded per dataset",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=DEFAULT_OUTPUT_CSV,
+        help="Path to the benchmark CSV output",
+    )
+    return parser.parse_args()
 
 
 def main() -> None:
-    dataset_file = find_first_dataset_file()
-    if not dataset_file:
-        print("No dataset found under DnA_dataset/ncbi_dataset/data. Please add a FASTA/FNA file.")
+    args = parse_args()
+    datasets = collect_datasets(args.dataset_root, args.max_files, args.max_prefix)
+    if not datasets:
+        print("No datasets found in the specified folder. Add FASTA/FNA files or run synthetic.py to generate some.")
         return
 
-    dataset_name = os.path.basename(dataset_file)
-    print(f"Loading dataset: {dataset_name}")
-
-    # Read the contiguous sequence
-    full_text = parse_fasta_contiguous(dataset_file)
-    print(f"Sequence length: {len(full_text):,} bp")
-
-    with open(OUTPUT_CSV_FILE, "w", newline="", encoding="utf-8") as fh:
+    print(f"Discovered {len(datasets)} dataset(s) for benchmarking.")
+    with open(args.output, "w", newline="", encoding="utf-8") as fh:
         writer = csv.writer(fh)
         write_header(writer)
 
-        benchmark_varying_text_lengths(full_text, dataset_name, writer)
-        benchmark_varying_pattern_lengths(full_text, dataset_name, writer)
+        for record in datasets:
+            display_name = f"{record.name} ({record.group})"
+            if record.source_path:
+                rel_path = os.path.relpath(record.source_path, SCRIPT_DIR)
+                print(f"\nDataset: {display_name} — using {rel_path}")
+            else:
+                print(f"\nDataset: {display_name} — synthetic in-memory sequence")
 
-    print(f"Benchmarks complete. Results saved to {OUTPUT_CSV_FILE}.")
+            print(f"  Available characters: {len(record.text):,}")
+            benchmark_varying_text_lengths(record, writer)
+            benchmark_varying_pattern_lengths(record, writer)
+
+    print(f"\nBenchmarks complete. Results saved to {args.output}.")
 
 
 if __name__ == "__main__":
