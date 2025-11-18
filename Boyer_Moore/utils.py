@@ -365,7 +365,3 @@ def format_sequence_pretty(sequence: str, line_length: int = 80) -> str:
     for i in range(0, len(sequence), line_length):
         lines.append(sequence[i:i + line_length])
     return '\n'.join(lines)
-
-
-
-
