@@ -1,0 +1,172 @@
+{
+  "n": 5273,
+  "k_errors": 1,
+  "k_patterns": 27,
+  "total_time_ms": 1199.3725009961054,
+  "peak_memory_mb": 12.291666984558105,
+  "total_matches": 141800,
+  "details": {
+    "ATCATCGAAT": {
+      "total": 4908,
+      "by_error_level": {
+        "0": 4908
+      }
+    },
+    "CGCTGATTTTTGCTG": {
+      "total": 5178,
+      "by_error_level": {
+        "0": 5178
+      }
+    },
+    "CGCTTAGGCCAGGATGCCGC": {
+      "total": 5254,
+      "by_error_level": {
+        "0": 5254
+      }
+    },
+    "ACCGGCAACGATGATCGACTGGCGT": {
+      "total": 5264,
+      "by_error_level": {
+        "0": 5264
+      }
+    },
+    "GCTATCCGTCCTATAACACCATTGTCGGCA": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    },
+    "ATTGTGCTGGAGTCTCTCGAAACCAGCCTGCGCCT": {
+      "total": 5268,
+      "by_error_level": {
+        "0": 5268
+      }
+    },
+    "TGGATGTCCATGACGTGGGTGTTTATGGTCAGGATCGCTC": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    },
+    "AAAAAGCCGGAAGAAATCGAAGCGTTGATGGTTGCTGCGAGAAAG": {
+      "total": 5270,
+      "by_error_level": {
+        "0": 5270
+      }
+    },
+    "CTGGCGGCGGGTACCTGTCAGCAACTGGCGCGCATCGGCGTCTGGCAATC": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    },
+    "GCTGCGTAAAGCACCTGGCGTAACGCTGCATTGCCCTGATCGCGTGGCTAACGTT": {
+      "total": 5270,
+      "by_error_level": {
+        "0": 5270
+      }
+    },
+    "CCGTGATTGCCAACGTTGCTACTTCCGTTGCGCATGAAGGGCGCGCTTTTGAACGCTTTA": {
+      "total": 5272,
+      "by_error_level": {
+        "0": 5272
+      }
+    },
+    "TGGCGACTTGGGAAAATTACCCACGCTGGTAAACGCAGTGCTTATCCGCTGGCGTTAACCCACG": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    },
+    "GCGCGGAGAAGACATGGGGGATTACGGCGTATTGTGCCGTTATCAGCAGCGTCGACAGAGCGAT": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    },
+    "GCACCCTCGGTTGGGTGGCGCGTTGAAGGCGGTTTTAAGGAATAAACAATGCAAAGTGTTGATG": {
+      "total": 5268,
+      "by_error_level": {
+        "0": 5268
+      }
+    },
+    "GGCTATCAATGCCGCCAGCGAAAAATTACTCACCCGTCTTGGCGTCTGGCAGGACATTCTCTCT": {
+      "total": 5271,
+      "by_error_level": {
+        "0": 5271
+      }
+    },
+    "GGAACAAAGCGCATCAGTCGTCAGATATCACTCTGTTAGCCCCCGCAGAATTACAGCAGGTCGC": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    },
+    "CATCACGCGCTGGTAGCGACCATTCGCACGGAAGAACCGCATGATGCGGTGGCGCGGCAGGTTT": {
+      "total": 5271,
+      "by_error_level": {
+        "0": 5271
+      }
+    },
+    "CGCTTTTGATAATCGCCTGGGCTTATGCAAGGTTGAGAGCGCGCGTCAGGTGTTCCCACTGACG": {
+      "total": 5270,
+      "by_error_level": {
+        "0": 5270
+      }
+    },
+    "GGTTGCATCGTCAGGGGAAAGACATCGGGCAGTACATTTATCTGCGTCGCTATGAGCGTAGCCG": {
+      "total": 5267,
+      "by_error_level": {
+        "0": 5267
+      }
+    },
+    "CTTATCCGCCAGGCAATGGGATTAAACGATTTGCCTGAATGGCTGCGTTAAAAATTTCTCCTCT": {
+      "total": 5270,
+      "by_error_level": {
+        "0": 5270
+      }
+    },
+    "TTTGACATTTTTTTAGCTCTTAATATTGTCTTATTCAAATTGACTTTCTCATCACATCATCTTT": {
+      "total": 5271,
+      "by_error_level": {
+        "0": 5271
+      }
+    },
+    "GATTGCGTTGGGGACCGGGAGTGGCTCCGATGCTGGGTTTCGTGGTGATAATTTCACCATGAAA": {
+      "total": 5272,
+      "by_error_level": {
+        "0": 5272
+      }
+    },
+    "GACGAACATCATGCGGTACGTACCGATGCCGGAATGTTTGATGTGTCACATATGACCATCGTCG": {
+      "total": 5266,
+      "by_error_level": {
+        "0": 5266
+      }
+    },
+    "CTACTACTTTACTGAAGATTTCTTCCGCCTCGTTGTTAACTCCGCCACCCGCGAAAAAGACCTC": {
+      "total": 5270,
+      "by_error_level": {
+        "0": 5270
+      }
+    },
+    "TGGAAGGGATGAAACCGTTCTTTGGCGTGCAGGCGGGCGATCTGTTTATTGCCACCACTGGTTA": {
+      "total": 5270,
+      "by_error_level": {
+        "0": 5270
+      }
+    },
+    "CTTTATGGTCAGGAGATGGACGAAACCATCTCTCCTTTAGCCGCCAACATGGGCTGGACCATCG": {
+      "total": 5267,
+      "by_error_level": {
+        "0": 5267
+      }
+    },
+    "CGATGCGCAGGGCAACCAGCATGAAGGCATTATCACCAGCGGTACTTTCTCCCCGACGCTGGGT": {
+      "total": 5269,
+      "by_error_level": {
+        "0": 5269
+      }
+    }
+  }
+}
