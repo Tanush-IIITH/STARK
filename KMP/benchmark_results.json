@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-13T11:11:15.418373",
+  "timestamp": "2025-11-18T14:35:56.304848",
   "benchmarks": [
     {
       "test_type": "basic_matching",
@@ -81,43 +81,43 @@
           "pattern_length": 5,
           "text_length": 100000,
           "matches_found": 95,
-          "time_seconds": 0.010807037353515625,
-          "time_ms": 10.807037353515625
+          "time_seconds": 0.010460138320922852,
+          "time_ms": 10.460138320922852
         },
         {
           "pattern_length": 10,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.011156797409057617,
-          "time_ms": 11.156797409057617
+          "time_seconds": 0.010373830795288086,
+          "time_ms": 10.373830795288086
         },
         {
           "pattern_length": 20,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.011069059371948242,
-          "time_ms": 11.069059371948242
+          "time_seconds": 0.010427474975585938,
+          "time_ms": 10.427474975585938
         },
         {
           "pattern_length": 50,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.011043548583984375,
-          "time_ms": 11.043548583984375
+          "time_seconds": 0.0103607177734375,
+          "time_ms": 10.3607177734375
         },
         {
           "pattern_length": 100,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.010980606079101562,
-          "time_ms": 10.980606079101562
+          "time_seconds": 0.010493278503417969,
+          "time_ms": 10.493278503417969
         },
         {
           "pattern_length": 200,
           "text_length": 100000,
           "matches_found": 1,
-          "time_seconds": 0.015435218811035156,
-          "time_ms": 15.435218811035156
+          "time_seconds": 0.010394096374511719,
+          "time_ms": 10.394096374511719
         }
       ]
     },
@@ -129,33 +129,33 @@
           "text_length": 10000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.00131988525390625,
-          "time_ms": 1.31988525390625,
-          "chars_per_second": 7576416.184971098
+          "time_seconds": 0.0010526180267333984,
+          "time_ms": 1.0526180267333984,
+          "chars_per_second": 9500122.310305776
         },
         {
           "text_length": 50000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.006294965744018555,
-          "time_ms": 6.294965744018555,
-          "chars_per_second": 7942854.978600916
+          "time_seconds": 0.005341768264770508,
+          "time_ms": 5.341768264770508,
+          "chars_per_second": 9360196.38473555
         },
         {
           "text_length": 100000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.012203454971313477,
-          "time_ms": 12.203454971313477,
-          "chars_per_second": 8194400.703331054
+          "time_seconds": 0.010910511016845703,
+          "time_ms": 10.910511016845703,
+          "chars_per_second": 9165473.536995761
         },
         {
           "text_length": 500000,
           "pattern_length": 20,
           "matches_found": 0,
-          "time_seconds": 0.05394577980041504,
-          "time_ms": 53.94577980041504,
-          "chars_per_second": 9268565.619958898
+          "time_seconds": 0.05417466163635254,
+          "time_ms": 54.17466163635254,
+          "chars_per_second": 9229406.975464847
         }
       ]
     },
@@ -164,8 +164,8 @@
       "text_length": 100000,
       "num_patterns": 10,
       "total_matches": 10,
-      "total_time_ms": 111.33337020874023,
-      "avg_time_per_pattern_ms": 11.133337020874023,
+      "total_time_ms": 105.45611381530762,
+      "avg_time_per_pattern_ms": 10.545611381530762,
       "pattern_results": [
         {
           "pattern": "AAGCCCAATA",
@@ -230,37 +230,37 @@
             {
               "pattern": "ATGCATGC",
               "matches": 27,
-              "time_ms": 493.884801864624,
+              "time_ms": 482.4810028076172,
               "first_match_pos": 147018
             },
             {
               "pattern": "GCTAGCTA",
               "matches": 9,
-              "time_ms": 496.7918395996094,
+              "time_ms": 483.05273056030273,
               "first_match_pos": 1021885
             },
             {
               "pattern": "TATAAA",
               "matches": 1164,
-              "time_ms": 500.22053718566895,
+              "time_ms": 485.61692237854004,
               "first_match_pos": 7610
             },
             {
               "pattern": "CAAT",
               "matches": 20936,
-              "time_ms": 497.68567085266113,
+              "time_ms": 478.93285751342773,
               "first_match_pos": 25
             },
             {
               "pattern": "GAATTC",
               "matches": 646,
-              "time_ms": 498.7032413482666,
+              "time_ms": 480.6051254272461,
               "first_match_pos": 3841
             },
             {
               "pattern": "GGATCC",
               "matches": 494,
-              "time_ms": 520.3485488891602,
+              "time_ms": 493.59965324401855,
               "first_match_pos": 6059
             }
           ]
@@ -272,37 +272,37 @@
             {
               "pattern": "ATGCATGC",
               "matches": 27,
-              "time_ms": 617.7465915679932,
+              "time_ms": 480.2281856536865,
               "first_match_pos": 138784
             },
             {
               "pattern": "GCTAGCTA",
               "matches": 9,
-              "time_ms": 493.2124614715576,
+              "time_ms": 479.3434143066406,
               "first_match_pos": 793074
             },
             {
               "pattern": "TATAAA",
               "matches": 1164,
-              "time_ms": 503.3307075500488,
+              "time_ms": 486.3107204437256,
               "first_match_pos": 9842
             },
             {
               "pattern": "CAAT",
               "matches": 20927,
-              "time_ms": 483.72769355773926,
+              "time_ms": 481.72497749328613,
               "first_match_pos": 48
             },
             {
               "pattern": "GAATTC",
               "matches": 645,
-              "time_ms": 509.2654228210449,
+              "time_ms": 480.5440902709961,
               "first_match_pos": 883
             },
             {
               "pattern": "GGATCC",
               "matches": 494,
-              "time_ms": 508.99720191955566,
+              "time_ms": 493.227481842041,
               "first_match_pos": 3219
             }
           ]
@@ -314,37 +314,37 @@
             {
               "pattern": "ATGCATGC",
               "matches": 27,
-              "time_ms": 520.695686340332,
+              "time_ms": 478.3368110656738,
               "first_match_pos": 147018
             },
             {
               "pattern": "GCTAGCTA",
               "matches": 9,
-              "time_ms": 626.8362998962402,
+              "time_ms": 479.08663749694824,
               "first_match_pos": 1021109
             },
             {
               "pattern": "TATAAA",
               "matches": 1164,
-              "time_ms": 567.7454471588135,
+              "time_ms": 481.04095458984375,
               "first_match_pos": 7610
             },
             {
               "pattern": "CAAT",
               "matches": 20927,
-              "time_ms": 536.2603664398193,
+              "time_ms": 477.7536392211914,
               "first_match_pos": 25
             },
             {
               "pattern": "GAATTC",
               "matches": 645,
-              "time_ms": 505.8317184448242,
+              "time_ms": 477.5502681732178,
               "first_match_pos": 3841
             },
             {
               "pattern": "GGATCC",
               "matches": 494,
-              "time_ms": 492.7349090576172,
+              "time_ms": 491.1081790924072,
               "first_match_pos": 6059
             }
           ]
