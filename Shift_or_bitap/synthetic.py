@@ -1,15 +1,15 @@
-"""Generate a synthetic FASTA dataset that mirrors the structure of the
-existing genomes under ``dataset/``.
-
-Each run emits a new ``*.fna`` file whose header and line wrapping follow the
-same conventions as NCBI genomes bundled with the project.
 """
-from __future__ import annotations
+Generate synthetic FASTA datasets for DNA pattern matching benchmarks.
+
+This script generates random DNA sequences in FASTA format with customizable
+parameters for benchmarking pattern matching algorithms.
+
+Compatible with Python 3.10+
+"""
 
 import argparse
 import os
 import random
-import string
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -20,74 +20,146 @@ DEFAULT_LENGTH = 200_000
 
 
 def wrap_lines(sequence: str, width: int) -> Iterable[str]:
-    """Yield ``sequence`` broken into ``width``-sized chunks."""
+    """Yield sequence broken into width-sized chunks."""
     for idx in range(0, len(sequence), width):
         yield sequence[idx : idx + width]
 
 
-def generate_sequence(length: int, seed: int | None = None) -> str:
+def generate_sequence(length: int, seed: int = None) -> str:
+    """
+    Generate a random DNA sequence of given length.
+
+    Args:
+        length: Number of base pairs to generate
+        seed: Random seed for reproducibility (optional)
+
+    Returns:
+        String of random DNA nucleotides (A, C, G, T)
+    """
     rng = random.Random(seed)
     return "".join(rng.choice(NUCLEOTIDES) for _ in range(length))
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Create a synthetic FASTA dataset")
+    parser = argparse.ArgumentParser(
+        description="Generate synthetic FASTA dataset for DNA pattern matching",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Generate 100K bp dataset
+  python synthetic.py --length 100000 --seed 42 --name SYNTH_100K \
+      --output synthetic_datasets/SYNTH_100K/SYNTH_100K.fna
+
+  # Generate 1M bp dataset with custom prefix
+  python synthetic.py --length 1000000 --seed 46 --prefix SYNTH_1M
+
+  # Use default settings
+  python synthetic.py --prefix TEST
+        """
+    )
+
     parser.add_argument(
         "--length",
         type=int,
         default=DEFAULT_LENGTH,
-        help="Number of bases to generate (default: %(default)s)",
+        help=f"Length of the synthetic sequence in base pairs (default: {DEFAULT_LENGTH:,})",
     )
-    parser.add_argument(
-        "--wrap",
-        type=int,
-        default=DEFAULT_WRAP,
-        help="Line width for FASTA output (default: %(default)s)",
-    )
+
     parser.add_argument(
         "--seed",
         type=int,
         default=None,
-        help="Optional RNG seed for reproducible output",
+        help="Random seed for reproducibility (default: uses system random)",
     )
+
+    parser.add_argument(
+        "--name",
+        type=str,
+        default=None,
+        help="Name for the dataset (used in FASTA header and default output path)",
+    )
+
     parser.add_argument(
         "--prefix",
+        type=str,
         default=None,
-        help="Custom dataset prefix (omit suffix). Defaults to timestamped SYNTH name.",
+        help="Alternative to --name (for backward compatibility)",
     )
+
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Output FASTA file path (default: synthetic_datasets/<name>/<name>.fna)",
+    )
+
+    parser.add_argument(
+        "--wrap",
+        type=int,
+        default=DEFAULT_WRAP,
+        help=f"Number of characters per line in FASTA (default: {DEFAULT_WRAP})",
+    )
+
     args = parser.parse_args()
 
-    if args.length <= 0:
-        raise ValueError("length must be positive")
-    if args.wrap <= 0:
-        raise ValueError("wrap must be positive")
+    # Determine dataset name (prefer --name, fall back to --prefix)
+    dataset_name = args.name or args.prefix
+    if not dataset_name:
+        dataset_name = "SYNTHETIC"
 
-    script_dir = Path(__file__).resolve().parent
-    dataset_dir = script_dir / "dataset"
-    dataset_dir.mkdir(parents=True, exist_ok=True)
-
-    if args.prefix:
-        safe_prefix = "".join(ch if ch.isalnum() or ch in ("_", "-") else "_" for ch in args.prefix)
+    # Determine output path
+    if args.output:
+        output_path = Path(args.output)
     else:
-        stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+        # Default: synthetic_datasets/<name>/<name>.fna
+        output_path = Path("synthetic_datasets") / dataset_name / f"{dataset_name}.fna"
 
-        safe_prefix = f"SYNTH_{stamp}_{''.join(random.choices(string.ascii_uppercase, k=4))}"
+    # Create output directory if it doesn't exist
+    output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    filename = f"{safe_prefix}_genomic.fna"
-    output_path = dataset_dir / filename
+    # Generate sequence
+    print(f"Generating {args.length:,} bp synthetic DNA sequence...")
+    print(f"  Dataset name: {dataset_name}")
+    print(f"  Random seed: {args.seed if args.seed is not None else 'random'}")
 
-    if output_path.exists():
-        raise FileExistsError(f"Refusing to overwrite existing dataset: {output_path}")
+    sequence = generate_sequence(args.length, args.seed)
 
-    sequence = generate_sequence(args.length, seed=args.seed)
-    header = f">{safe_prefix} synthetic genome (length={len(sequence)})"
+    # Write FASTA file
+    print(f"Writing to {output_path}...")
 
-    with output_path.open("w", encoding="utf-8") as handle:
-        handle.write(header + "\n")
+    # Use timezone.utc instead of UTC for Python 3.10 compatibility
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    with open(output_path, "w") as f:
+        # FASTA header
+        seed_str = f"seed={args.seed}" if args.seed is not None else "seed=random"
+        header = f">{dataset_name} length={args.length} {seed_str} generated={timestamp}"
+        f.write(header + "\n")
+
+        # Write sequence with line wrapping
         for line in wrap_lines(sequence, args.wrap):
-            handle.write(line + "\n")
+            f.write(line + "\n")
 
-    print(f"Synthetic dataset written to {output_path}")
+    # Print summary
+    file_size_kb = output_path.stat().st_size / 1024
+    print(f"\n✓ Successfully generated synthetic dataset!")
+    print(f"  Output file: {output_path}")
+    print(f"  Sequence length: {args.length:,} bp")
+    print(f"  File size: {file_size_kb:.2f} KB")
+
+    # Calculate composition
+    a_count = sequence.count('A')
+    c_count = sequence.count('C')
+    g_count = sequence.count('G')
+    t_count = sequence.count('T')
+    gc_content = (g_count + c_count) / args.length * 100
+
+    print(f"\n  Nucleotide composition:")
+    print(f"    A: {a_count:,} ({a_count/args.length*100:.1f}%)")
+    print(f"    C: {c_count:,} ({c_count/args.length*100:.1f}%)")
+    print(f"    G: {g_count:,} ({g_count/args.length*100:.1f}%)")
+    print(f"    T: {t_count:,} ({t_count/args.length*100:.1f}%)")
+    print(f"    GC content: {gc_content:.1f}%")
 
 
 if __name__ == "__main__":
