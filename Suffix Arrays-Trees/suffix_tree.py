@@ -10,10 +10,6 @@ import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional
 
-# =============================================================================
-# Naive Suffix Tree (Unaffected)
-# =============================================================================
-
 @dataclass
 class SuffixTreeNode:
     """Trie node used by the naive suffix tree."""
@@ -43,10 +39,6 @@ def naive_search(root: SuffixTreeNode, pattern: str) -> List[int]:
             return []
         current = current.children[char]
     return sorted(current.indices)
-
-# =============================================================================
-# Ukkonen's Suffix Tree (Corrected Implementation)
-# =============================================================================
 
 class UkkonenNode:
     """Node class for a correct Ukkonen's suffix tree implementation."""
@@ -81,8 +73,17 @@ class UkkonenSuffixTree:
         edge_len = node.edge_len()
         if self.active_length >= edge_len:
             self.active_length -= edge_len
-            self.active_edge = self.text[node.start + edge_len]
             self.active_node = node
+            if self.active_length > 0:
+                next_char_idx = node.start + edge_len
+                if next_char_idx < self.n:
+                    self.active_edge = self.text[next_char_idx]
+                else:
+                    # Reached the end of the text (leaf edge); reset state.
+                    self.active_length = 0
+                    self.active_edge = None
+            else:
+                self.active_edge = None
             return True
         return False
 
@@ -162,11 +163,9 @@ class UkkonenSuffixTree:
         for child in node.children.values():
             self._collect_leaves(child, results)
 
-    # --- FUNCTION LOGIC CORRECTED ---
     def search_pattern(self, pattern: str) -> List[int]:
         """Return all starting indices for *pattern*."""
         
-        # FIX 1: Empty pattern ("")
         # The naive tree (given "text$") returns all indices from 0 to n.
         # This implementation must do the same. self.n includes the '$'.
         if not pattern:
@@ -182,7 +181,6 @@ class UkkonenSuffixTree:
         results: List[int] = []
         self._collect_leaves(node, results)
         
-        # FIX 2: Remove filtering
         # The naive tree (on "text$") includes all matching indices.
         # This implementation must also include all of them.
         # The previous filtering was incorrect for this test.
@@ -204,11 +202,6 @@ def build_ukkonen_suffix_tree(text: str) -> UkkonenSuffixTree:
 def ukkonen_search(tree: UkkonenSuffixTree, pattern: str) -> List[int]:
     """Return all starting indices for *pattern* using Ukkonen's suffix tree."""
     return tree.search_pattern(pattern)
-
-
-# =============================================================================
-# Main CLI (Unaffected)
-# =============================================================================
 
 def _interactive_cli() -> None:
     """Drive a small REPL for building and querying suffix trees."""

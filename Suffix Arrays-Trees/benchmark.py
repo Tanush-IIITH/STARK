@@ -26,10 +26,12 @@ from suffix_array import (
     locate_pattern,
     manber_myers_suffix_array,
 )
-from suffix_tree import build_naive_suffix_tree, naive_search
-
-# Placeholder imports for future algorithms (e.g., Ukkonen's algorithm).
-# from suffix_tree import build_ukkonen_suffix_tree, ukkonen_search
+from suffix_tree import (
+    build_naive_suffix_tree,
+    naive_search,
+    build_ukkonen_suffix_tree,
+    ukkonen_search,
+)
 
 
 def parse_fasta_file(filepath: str) -> str:
@@ -200,6 +202,21 @@ if __name__ == "__main__":
                 else:
                     print(f"    Skipping st_naive (n > {ST_NAIVE_THRESHOLD})")
 
+                structure, elapsed, memory = benchmark_construction(build_ukkonen_suffix_tree, text)
+                built_structures["st_ukkonen"] = structure
+                write_csv_row(
+                    writer,
+                    [
+                        "st_ukkonen",
+                        dataset_name,
+                        n,
+                        0,
+                        "construction",
+                        elapsed,
+                        memory,
+                    ],
+                )
+
                 structure, elapsed, memory = benchmark_construction(manber_myers_suffix_array, text)
                 built_structures["sa_manber"] = structure
                 write_csv_row(
@@ -254,6 +271,21 @@ if __name__ == "__main__":
                             writer,
                             [
                                 "st_naive_query",
+                                dataset_name,
+                                n,
+                                m,
+                                "query",
+                                elapsed,
+                                0,
+                            ],
+                        )
+
+                    if "st_ukkonen" in built_structures:
+                        elapsed = benchmark_query(ukkonen_search, built_structures["st_ukkonen"], pattern)
+                        write_csv_row(
+                            writer,
+                            [
+                                "st_ukkonen_query",
                                 dataset_name,
                                 n,
                                 m,
