@@ -1,0 +1,10 @@
+# Requirements for Shift-Or/Bitap Algorithm Implementation
+# Python 3.7+
+
+# Visualization
+matplotlib>=3.5.0
+
+# Data processing
+numpy>=1.21.0
+
+# No other dependencies required - pure Python implementation

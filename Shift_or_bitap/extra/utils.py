@@ -367,5 +367,12 @@ def format_sequence_pretty(sequence: str, line_length: int = 80) -> str:
     return '\n'.join(lines)
 
 
-
-
+def parse_fasta_contiguous(filepath: str) -> str:
+    """Reads a FASTA/FNA file and returns the concatenated DNA sequence as a single string."""
+    seq_parts = []
+    with open(filepath, "r", encoding="utf-8") as fh:
+        for line in fh:
+            if line.startswith(">"):
+                continue
+            seq_parts.append(line.strip().upper())
+    return "".join(seq_parts)
