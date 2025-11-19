@@ -98,8 +98,7 @@ def main():
     print("PYTHON RE MODULE BENCHMARKING (EXACT MATCH)")
     print("="*70)
     print(f"Input datasets folder: {DATASET_ROOT}")
-    print(f"Output: {OUTPUT_ROOT}/[dataset]/pattern_length_results_re.csv
-")
+    print(f"Output: {OUTPUT_ROOT}/[dataset]/pattern_length_results_re.csv")
     os.makedirs(OUTPUT_ROOT, exist_ok=True)
 
     datasets = [d for d in os.listdir(DATASET_ROOT) if os.path.isdir(os.path.join(DATASET_ROOT, d))]
@@ -115,8 +114,7 @@ def main():
         output_dir = os.path.join(OUTPUT_ROOT, dataset_name)
         os.makedirs(output_dir, exist_ok=True)
         run_benchmarks_on_dataset(dataset_name, fasta_file, output_dir)
-    print("
-✓ All Python re benchmarks complete!")
+    print("All Python re benchmarks complete!")
 
 
 if __name__ == "__main__":
