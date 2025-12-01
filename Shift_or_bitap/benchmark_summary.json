@@ -1,0 +1,23 @@
+{
+  "total_datasets": 30,
+  "real_datasets": 20,
+  "synthetic_datasets": 10,
+  "algorithms": {
+    "exact": {
+      "avg_time_s": 2.6490709329535695,
+      "avg_memory_mb": 16.978455718358358,
+      "datasets_tested": 26
+    },
+    "approximate": {
+      "avg_time_s": 1.69196080659943,
+      "avg_memory_mb": 8.742130639817981,
+      "datasets_tested": 5
+    },
+    "extended": {
+      "avg_time_s": 6.58843447267102,
+      "avg_memory_mb": 16.155253600248525,
+      "datasets_tested": 23
+    }
+  },
+  "generated_at": "2025-11-18T18:21:05.747819"
+}
