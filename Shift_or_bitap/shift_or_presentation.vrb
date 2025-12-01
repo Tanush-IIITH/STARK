@@ -1,0 +1,36 @@
+\frametitle{Algorithm Flow: Exact Matching}
+
+\textbf{Step 1: Preprocessing}
+
+Build character masks for DNA alphabet:
+
+\vspace{0.3cm}
+
+{\small
+\texttt{masks = \{\}}\\
+\texttt{for i, char in enumerate(pattern):}\\
+\texttt{\quad if char not in masks:}\\
+\texttt{\quad\quad masks[char] = 0}\\
+\texttt{\quad masks[char] |= (1 << i)}
+}
+
+\vspace{0.5cm}
+
+\textbf{Step 2: Matching}
+
+Process text character-by-character with state updates:
+
+\vspace{0.3cm}
+
+{\small
+\texttt{state = \textasciitilde 1  \# All bits set except bit 0}\\
+\texttt{for char in text:}\\
+\texttt{\quad state = (state >> 1) | masks[char]}\\
+\texttt{\quad if (state \& 1) == 0:}\\
+\texttt{\quad\quad yield match\_position}
+}
+
+\vspace{0.3cm}
+
+Each iteration takes $O(1)$ time, resulting in overall $O(n)$ search time.
+
