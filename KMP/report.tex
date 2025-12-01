@@ -3,6 +3,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{graphicx}
@@ -28,6 +29,13 @@
     numbers=left,
     numberstyle=\tiny\color{gray}
 }
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
 
 \title{\textbf{Knuth--Morris--Pratt (KMP) Algorithm for DNA Pattern Matching}}
 \author{STARK DNA Pattern Matching Project}
@@ -66,7 +74,40 @@ We scan $T$ left-to-right while maintaining an index $j$ into $P$. On match, adv
 \end{itemize}
 
 \section{Proof of Correctness}
-\textbf{Invariant}: Before each text character access, $j$ equals the length of the longest prefix of $P$ matching a suffix of the processed text. On mismatch, setting $j \gets \mathrm{LPS}[j-1]$ preserves this invariant. Since $j$ never decreases below 0 and increases only on matches, the algorithm examines each text character at most a constant number of times, and every reported match corresponds to $m$ consecutive equalities.
+We provide a formal proof of correctness for the KMP algorithm by establishing a loop invariant for the search phase and proving the time complexity bound using amortized analysis.
+
+\subsection{Loop Invariant and Correctness}
+We define the invariant for the `while` loop in the search procedure where $i$ is the text index and $j$ is the pattern index. Let $\pi$ denote the failure function table (LPS).
+
+\begin{theorem}[Correctness Invariant]
+At the start of each iteration of the `while` loop, $P[0 \dots j-1]$ is the longest prefix of $P$ that is a suffix of $T[0 \dots i-1]$.
+\end{theorem}
+
+\begin{proof}
+We proceed by induction on the number of loop iterations.
+\begin{itemize}
+    \item \textbf{Initialization:} Initially $i=0, j=0$. $P[0 \dots -1]$ and $T[0 \dots -1]$ are empty strings $\epsilon$. $\epsilon$ is the longest prefix of $P$ that is a suffix of $\epsilon$. The invariant holds.
+    \item \textbf{Maintenance:} Assume the invariant holds at the start of an iteration.
+    \begin{enumerate}
+        \item \textbf{Case 1 ($T[i] == P[j]$):} We increment both $i$ and $j$. Since $P[0 \dots j-1]$ is a suffix of $T[0 \dots i-1]$ (inductive hypothesis) and $P[j] = T[i]$, it follows that $P[0 \dots j]$ is a suffix of $T[0 \dots i]$. The length of the matching prefix becomes $j+1$, maintaining the invariant.
+        \item \textbf{Case 2 ($T[i] \neq P[j]$ and $j > 0$):} We update $j \gets \pi[j-1]$. By the definition of the failure function, the new $P[0 \dots \pi[j-1]-1]$ is the second longest prefix of $P$ that matches the suffix of $T[0 \dots i-1]$. We do not increment $i$, so we re-test against $T[i]$ in the next iteration. This recursive reduction continues until a match is found or $j=0$.
+        \item \textbf{Case 3 ($T[i] \neq P[j]$ and $j == 0$):} No prefix of $P$ matches $T[0 \dots i]$. We increment $i$. The longest matching prefix is empty (length 0). The invariant holds.
+    \end{enumerate}
+    \item \textbf{Termination:} The algorithm terminates when $i = n$. If $j=m$ at any point, a match is recorded, implying $P[0 \dots m-1]$ is a suffix of $T[0 \dots i-1]$.
+\end{itemize}
+\end{proof}
+
+\subsection{Time Complexity Proof via Potential Function}
+To rigorously prove the $O(n)$ time complexity, we use an amortized analysis.
+\begin{proof}
+Define a potential function $\Phi = 2i - j$.
+\begin{itemize}
+    \item When $T[i] = P[j]$: $i \to i+1, j \to j+1$. $\Delta \Phi = 2(i+1) - (j+1) - (2i - j) = 1$.
+    \item When $T[i] \neq P[j], j > 0$: $i \to i, j \to \pi[j-1]$. Since $\pi[j-1] < j$, $j$ decreases. $\Delta \Phi = 2i - \pi[j-1] - (2i - j) = j - \pi[j-1] \ge 1$.
+    \item When $T[i] \neq P[j], j = 0$: $i \to i+1, j \to 0$. $\Delta \Phi = 2(i+1) - 0 - (2i - 0) = 2$.
+\end{itemize}
+In every step, $\Phi$ increases by at least 1. Since initially $\Phi = 0$ and finally $\Phi \approx 2n$ (as $j < m \le n$), the total number of operations is bounded by $2n$. Thus, the time complexity is $O(n)$.
+\end{proof}
 
 \section{Pseudocode}
 \subsection{LPS Computation}
