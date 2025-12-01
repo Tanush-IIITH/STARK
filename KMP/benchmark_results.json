@@ -1,0 +1,355 @@
+{
+  "timestamp": "2025-12-02T00:52:16.338789",
+  "benchmarks": [
+    {
+      "test_type": "basic_matching",
+      "passed": 5,
+      "failed": 0,
+      "details": [
+        {
+          "test": "Simple match",
+          "status": "PASS",
+          "expected": [
+            0,
+            4,
+            8
+          ],
+          "got": [
+            0,
+            4,
+            8
+          ]
+        },
+        {
+          "test": "No match",
+          "status": "PASS",
+          "expected": [],
+          "got": []
+        },
+        {
+          "test": "Multiple matches",
+          "status": "PASS",
+          "expected": [
+            2,
+            6
+          ],
+          "got": [
+            2,
+            6
+          ]
+        },
+        {
+          "test": "Pattern equals text",
+          "status": "PASS",
+          "expected": [
+            0
+          ],
+          "got": [
+            0
+          ]
+        },
+        {
+          "test": "Overlapping matches",
+          "status": "PASS",
+          "expected": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "got": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "test_type": "edge_cases",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "benchmark_type": "pattern_length",
+      "text_length": 100000,
+      "results": [
+        {
+          "pattern_length": 5,
+          "text_length": 100000,
+          "matches_found": 95,
+          "time_seconds": 0.012620925903320312,
+          "time_ms": 12.620925903320312
+        },
+        {
+          "pattern_length": 10,
+          "text_length": 100000,
+          "matches_found": 1,
+          "time_seconds": 0.01249837875366211,
+          "time_ms": 12.49837875366211
+        },
+        {
+          "pattern_length": 20,
+          "text_length": 100000,
+          "matches_found": 1,
+          "time_seconds": 0.014624595642089844,
+          "time_ms": 14.624595642089844
+        },
+        {
+          "pattern_length": 50,
+          "text_length": 100000,
+          "matches_found": 1,
+          "time_seconds": 0.01417684555053711,
+          "time_ms": 14.17684555053711
+        },
+        {
+          "pattern_length": 100,
+          "text_length": 100000,
+          "matches_found": 1,
+          "time_seconds": 0.013699054718017578,
+          "time_ms": 13.699054718017578
+        },
+        {
+          "pattern_length": 200,
+          "text_length": 100000,
+          "matches_found": 1,
+          "time_seconds": 0.015418052673339844,
+          "time_ms": 15.418052673339844
+        }
+      ]
+    },
+    {
+      "benchmark_type": "text_length",
+      "pattern_length": 20,
+      "results": [
+        {
+          "text_length": 10000,
+          "pattern_length": 20,
+          "matches_found": 0,
+          "time_seconds": 0.001272439956665039,
+          "time_ms": 1.272439956665039,
+          "chars_per_second": 7858916.994566236
+        },
+        {
+          "text_length": 50000,
+          "pattern_length": 20,
+          "matches_found": 0,
+          "time_seconds": 0.0075495243072509766,
+          "time_ms": 7.549524307250977,
+          "chars_per_second": 6622933.838623085
+        },
+        {
+          "text_length": 100000,
+          "pattern_length": 20,
+          "matches_found": 0,
+          "time_seconds": 0.013009071350097656,
+          "time_ms": 13.009071350097656,
+          "chars_per_second": 7686943.7724507
+        },
+        {
+          "text_length": 500000,
+          "pattern_length": 20,
+          "matches_found": 0,
+          "time_seconds": 0.10453462600708008,
+          "time_ms": 104.53462600708008,
+          "chars_per_second": 4783104.116775003
+        }
+      ]
+    },
+    {
+      "benchmark_type": "multiple_patterns",
+      "text_length": 100000,
+      "num_patterns": 10,
+      "total_matches": 10,
+      "total_time_ms": 204.05888557434082,
+      "avg_time_per_pattern_ms": 20.405888557434082,
+      "pattern_results": [
+        {
+          "pattern": "AAGCCCAATA",
+          "pattern_length": 10,
+          "matches": 1
+        },
+        {
+          "pattern": "TTGAAGGAGTCTAGC",
+          "pattern_length": 15,
+          "matches": 1
+        },
+        {
+          "pattern": "AAACCTTTCTACTATGTGTT",
+          "pattern_length": 20,
+          "matches": 1
+        },
+        {
+          "pattern": "ACAGCTCAGGAGCCAGTCCC...",
+          "pattern_length": 25,
+          "matches": 1
+        },
+        {
+          "pattern": "AGGACGCCCAACTATTCTTT...",
+          "pattern_length": 30,
+          "matches": 1
+        },
+        {
+          "pattern": "AGTGCTGGTGTGATAAGCAA...",
+          "pattern_length": 35,
+          "matches": 1
+        },
+        {
+          "pattern": "AGCTCGGTGTGGTGGGCACG...",
+          "pattern_length": 40,
+          "matches": 1
+        },
+        {
+          "pattern": "CCGCAACGGTATGTGTTAAT...",
+          "pattern_length": 45,
+          "matches": 1
+        },
+        {
+          "pattern": "GAGGTCTTGGTTGCCTCTAG...",
+          "pattern_length": 50,
+          "matches": 1
+        },
+        {
+          "pattern": "GGGATGAATGCGCCGCAAGT...",
+          "pattern_length": 55,
+          "matches": 1
+        }
+      ]
+    },
+    {
+      "benchmark_type": "real_dataset",
+      "files_processed": 3,
+      "results": [
+        {
+          "filename": "GCA_000005845.2_ASM584v2_genomic.fna",
+          "sequence_length": 4641652,
+          "patterns": [
+            {
+              "pattern": "ATGCATGC",
+              "matches": 27,
+              "time_ms": 675.8584976196289,
+              "first_match_pos": 147018
+            },
+            {
+              "pattern": "GCTAGCTA",
+              "matches": 9,
+              "time_ms": 559.429407119751,
+              "first_match_pos": 1021885
+            },
+            {
+              "pattern": "TATAAA",
+              "matches": 1164,
+              "time_ms": 497.7598190307617,
+              "first_match_pos": 7610
+            },
+            {
+              "pattern": "CAAT",
+              "matches": 20936,
+              "time_ms": 514.2605304718018,
+              "first_match_pos": 25
+            },
+            {
+              "pattern": "GAATTC",
+              "matches": 646,
+              "time_ms": 491.15538597106934,
+              "first_match_pos": 3841
+            },
+            {
+              "pattern": "GGATCC",
+              "matches": 494,
+              "time_ms": 502.02059745788574,
+              "first_match_pos": 6059
+            }
+          ]
+        },
+        {
+          "filename": "GCA_000269645.2_PB_Esch_coli_MG12655_V1_genomic.fna",
+          "sequence_length": 4638970,
+          "patterns": [
+            {
+              "pattern": "ATGCATGC",
+              "matches": 27,
+              "time_ms": 485.3239059448242,
+              "first_match_pos": 138784
+            },
+            {
+              "pattern": "GCTAGCTA",
+              "matches": 9,
+              "time_ms": 494.72761154174805,
+              "first_match_pos": 793074
+            },
+            {
+              "pattern": "TATAAA",
+              "matches": 1164,
+              "time_ms": 498.211145401001,
+              "first_match_pos": 9842
+            },
+            {
+              "pattern": "CAAT",
+              "matches": 20927,
+              "time_ms": 497.15495109558105,
+              "first_match_pos": 48
+            },
+            {
+              "pattern": "GAATTC",
+              "matches": 645,
+              "time_ms": 487.8857135772705,
+              "first_match_pos": 883
+            },
+            {
+              "pattern": "GGATCC",
+              "matches": 494,
+              "time_ms": 514.1422748565674,
+              "first_match_pos": 3219
+            }
+          ]
+        },
+        {
+          "filename": "GCA_000273425.1_Esch_coli_MG12655_V1_genomic.fna",
+          "sequence_length": 4638970,
+          "patterns": [
+            {
+              "pattern": "ATGCATGC",
+              "matches": 27,
+              "time_ms": 492.5520420074463,
+              "first_match_pos": 147018
+            },
+            {
+              "pattern": "GCTAGCTA",
+              "matches": 9,
+              "time_ms": 494.5051670074463,
+              "first_match_pos": 1021109
+            },
+            {
+              "pattern": "TATAAA",
+              "matches": 1164,
+              "time_ms": 504.8556327819824,
+              "first_match_pos": 7610
+            },
+            {
+              "pattern": "CAAT",
+              "matches": 20927,
+              "time_ms": 491.44887924194336,
+              "first_match_pos": 25
+            },
+            {
+              "pattern": "GAATTC",
+              "matches": 645,
+              "time_ms": 485.2755069732666,
+              "first_match_pos": 3841
+            },
+            {
+              "pattern": "GGATCC",
+              "matches": 494,
+              "time_ms": 495.9852695465088,
+              "first_match_pos": 6059
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
